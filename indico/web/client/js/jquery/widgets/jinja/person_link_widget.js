@@ -16,6 +16,7 @@ import {camelizeKeys} from 'indico/utils/case';
     const {
       fieldId,
       eventId,
+      categoryId,
       roles,
       sessionUser,
       hasPredefinedAffiliations,
@@ -44,21 +45,24 @@ import {camelizeKeys} from 'indico/utils/case';
         type: sessionUser.type,
       };
 
-    ReactDOM.render(
-      <WTFPersonLinkField
-        fieldId={fieldId}
-        eventId={eventId}
-        defaultValue={camelizeKeys(persons)}
-        roles={roles || []}
-        sessionUser={user}
-        hasPredefinedAffiliations={hasPredefinedAffiliations}
-        canEnterManually={canEnterManually}
-        defaultSearchExternal={defaultSearchExternal}
-        nameFormat={nameFormat}
-        extraParams={camelizeKeys(extraParams)}
-        {...rest}
-      />,
-      document.getElementById(`person-link-field-${fieldId}`)
-    );
+    if (!options.disableUserSearch) {
+        ReactDOM.render(
+          <WTFPersonLinkField
+            fieldId={fieldId}
+            eventId={eventId}
+            categoryId={categoryId}
+            defaultValue={camelizeKeys(persons)}
+            roles={roles || []}
+            sessionUser={user}
+            hasPredefinedAffiliations={hasPredefinedAffiliations}
+            canEnterManually={canEnterManually}
+            defaultSearchExternal={defaultSearchExternal}
+            nameFormat={nameFormat}
+            extraParams={camelizeKeys(extraParams)}
+            {...rest}
+          />,
+          document.getElementById(`person-link-field-${fieldId}`)
+        );
+    };
   };
 })(window);

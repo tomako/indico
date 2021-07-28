@@ -59,9 +59,11 @@
         $('#permissions-widget-{{ field.id }}').permissionswidget({
             objectType: {{ field.object_type | tojson }},
             isUnlisted: {{ field.is_unlisted | tojson }},
-            permissionsInfo: {{ field.permissions_info | tojson }},
+	    permissionsInfo: {{ field.permissions_info | tojson }},
             hiddenPermissions: {{ field.hidden_permissions | default([]) | tojson }},
-            hiddenPermissionsInfo: {{ field.hidden_permissions_info | tojson }}
+            hiddenPermissionsInfo: {{ field.hidden_permissions_info | tojson }},
+            eventId: {{ (field.event.id if field.event else none) | tojson }},
+            categoryId: {{ (field.category.id if field.category else none) | tojson }},
         });
 
         // make sure permission widget updates even if protection widget is not there to trigger an update

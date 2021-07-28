@@ -16,6 +16,7 @@ from webargs import validate
 from webargs.flaskparser import abort
 from werkzeug.exceptions import Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.unaccent import unaccent_match
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -457,6 +458,11 @@ class RHSyncEventPerson(RHEventPersonActionBase):
 
 
 class RHEventPersonSearch(RHAuthenticatedEventBase):
+    def _check_access(self):
+        RHAuthenticatedEventBase._check_access(self)
+        if not config.ALLOW_PUBLIC_USER_SEARCH and not self.event.can_manage(session.user):
+            raise Forbidden
+
     def _search_event_persons(self, exact=False, **criteria):
         criteria = {key: v for key, value in criteria.items() if (v := value.strip())}
 

@@ -31,18 +31,21 @@ class AttachmentFormBase(IndicoForm):
     acl = AccessControlListField(_('Access control list'), [UsedIf(lambda form, field: form.protected.data)],
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
-                                 event=lambda form: form.event,
                                  description=_('The list of users and groups allowed to access the material'))
 
     def __init__(self, *args, **kwargs):
+        acl_enabled = kwargs.pop('acl_enabled', True)
         linked_object = kwargs.pop('linked_object')
         self.event = getattr(linked_object, 'event', None)  # not present in categories
         super().__init__(*args, **kwargs)
         self.folder.query = (AttachmentFolder.query
                              .filter_by(object=linked_object, is_default=False, is_deleted=False)
                              .order_by(db.func.lower(AttachmentFolder.title)))
-        if self.event and self.event.is_unlisted:
+        if not acl_enabled:
+            del self.acl
+        elif self.event and self.event.is_unlisted:
             self.acl.allow_category_roles = False
+
 
     @generated_data
     def protection_mode(self):
@@ -94,7 +97,6 @@ class AttachmentFolderForm(IndicoForm):
     acl = AccessControlListField(_('Access control list'), [UsedIf(lambda form, field: form.protected.data)],
                                  allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                  allow_category_roles=True, allow_registration_forms=True,
-                                 event=lambda form: form.event,
                                  description=_('The list of users and groups allowed to access the folder'))
     is_always_visible = BooleanField(_('Always Visible'),
                                      [HiddenUnless('is_hidden', value=False)],
@@ -110,11 +112,14 @@ class AttachmentFolderForm(IndicoForm):
                                            'e.g. in download links. The access permissions still apply.'))
 
     def __init__(self, *args, **kwargs):
+        acl_enabled = kwargs.pop('acl_enabled', True)
         self.linked_object = kwargs.pop('linked_object')
         self.event = getattr(self.linked_object, 'event', None)  # not present in categories
         super().__init__(*args, **kwargs)
         self.title.choices = self._get_title_suggestions()
-        if self.event and self.event.is_unlisted:
+        if not acl_enabled:
+            del self.acl
+        elif self.event and self.event.is_unlisted:
             self.acl.allow_category_roles = False
 
     def _get_title_suggestions(self):

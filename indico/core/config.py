@@ -28,6 +28,7 @@ from indico.util.string import crc32, snakify
 
 # Note: Whenever you add/change something here, you MUST update the docs (settings.rst) as well
 DEFAULTS = {
+    'ALLOW_PUBLIC_USER_SEARCH': True,
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,

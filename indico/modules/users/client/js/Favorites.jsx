@@ -23,15 +23,18 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
 import './Favorites.module.scss';
 
-window.setupFavoriteSelection = function setupFavoriteSelection(userId) {
-  ReactDOM.render(<FavoriteManager userId={userId} />, document.getElementById('user-favorites'));
+window.setupFavoriteSelection = function setupFavoriteSelection(userId, userSearchDisabled) {
+  ReactDOM.render(
+    <FavoriteManager userId={userId} userSearchDisabled={userSearchDisabled} />,
+    document.getElementById('user-favorites')
+  );
 };
 
-function FavoriteManager({userId}) {
+function FavoriteManager({userId, userSearchDisabled}) {
   return (
     <>
       <div className="row">
-        <FavoriteUserManager userId={userId} />
+        <FavoriteUserManager userId={userId} userSearchDisabled={userSearchDisabled} />
         <FavoriteCatManager userId={userId} />
       </div>
       <div className="row">
@@ -43,10 +46,12 @@ function FavoriteManager({userId}) {
 
 FavoriteManager.propTypes = {
   userId: PropTypes.number,
+  userSearchDisabled: PropTypes.bool,
 };
 
 FavoriteManager.defaultProps = {
   userId: null,
+  userSearchDisabled: false,
 };
 
 function FavoriteCatManager({userId}) {
@@ -246,7 +251,7 @@ FavoriteEventManager.defaultProps = {
   userId: null,
 };
 
-function FavoriteUserManager({userId}) {
+function FavoriteUserManager({userId, userSearchDisabled}) {
   const [favoriteUsers, [addFavoriteUser, deleteFavoriteUser], loading] = useFavoriteUsers(userId);
 
   const searchTrigger = triggerProps => (
@@ -300,19 +305,23 @@ function FavoriteUserManager({userId}) {
           )}
         </div>
       </div>
-      <UserSearch
-        existing={Object.values(favoriteUsers).map(u => u.identifier)}
-        onAddItems={e => e.forEach(u => addFavoriteUser(u.userId))}
-        triggerFactory={searchTrigger}
-      />
+      {!userSearchDisabled && (
+        <UserSearch
+          existing={Object.values(favoriteUsers).map(u => u.identifier)}
+          onAddItems={e => e.forEach(u => addFavoriteUser(u.userId))}
+          triggerFactory={searchTrigger}
+        />
+      )}
     </div>
   );
 }
 
 FavoriteUserManager.propTypes = {
   userId: PropTypes.number,
+  userSearchDisabled: PropTypes.bool,
 };
 
 FavoriteUserManager.defaultProps = {
   userId: null,
+  userSearchDisabled: false,
 };
