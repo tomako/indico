@@ -49,7 +49,7 @@ def serialize_principal(principal):
 class PrincipalListField(HiddenField):
     """A field that lets you select a list of principals.
 
-    Principals are users or other objects represending users such as
+    Principals are users or other objects representing users such as
     groups or roles that can be added to ACLs.
 
     :param allow_external_users: If "search users with no indico account"
@@ -83,7 +83,7 @@ class PrincipalListField(HiddenField):
         return self.get_form().event
 
     def _convert_principal(self, principal):
-        event_id = self._event.id if self._event else None
+        event_id = self.event.id if self.event else None
         return principal_from_identifier(principal, event_id=event_id, allow_groups=self.allow_groups,
                                          allow_external_users=self.allow_external_users,
                                          allow_event_roles=self.allow_event_roles,
