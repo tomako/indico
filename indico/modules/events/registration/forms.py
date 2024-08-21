@@ -460,8 +460,7 @@ class RegistrationManagersForm(IndicoForm):
 
     managers = PrincipalListField(_('Registration managers'), allow_groups=True, allow_event_roles=True,
                                   allow_category_roles=True, allow_emails=True, allow_external_users=True,
-                                  description=_('List of users allowed to modify registrations'),
-                                  event=lambda form: form.event)
+                                  description=_('List of users allowed to modify registrations'))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

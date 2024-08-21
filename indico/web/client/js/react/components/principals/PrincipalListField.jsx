@@ -42,6 +42,7 @@ const PrincipalListField = props => {
     withCategoryRoles,
     withRegistrants,
     eventId,
+    categoryId,
     favoriteUsersController,
     className,
   } = props;
@@ -126,6 +127,8 @@ const PrincipalListField = props => {
                 withExternalUsers={withExternalUsers}
                 onOpen={onFocus}
                 onClose={onBlur}
+                eventId={eventId}
+                categoryId={categoryId}
               />
               {withGroups && (
                 <GroupSearch
@@ -184,6 +187,7 @@ PrincipalListField.propTypes = {
   withCategoryRoles: PropTypes.bool,
   withRegistrants: PropTypes.bool,
   eventId: PropTypes.number,
+  categoryId: PropTypes.number,
   className: PropTypes.string,
 };
 
@@ -194,6 +198,7 @@ PrincipalListField.defaultProps = {
   withCategoryRoles: false,
   withRegistrants: false,
   eventId: null,
+  categoryId: null,
   readOnly: false,
   className: undefined,
 };

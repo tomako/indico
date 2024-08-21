@@ -291,6 +291,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - settings (CategorySetting.category)
     # - suggestions (SuggestedCategory.category)
 
+    @property
+    def category(self):
+        """Convenience property so all category entities have it."""
+        return self
+
     @hybrid_property
     def event_message(self):
         return MarkdownText(self._event_message)

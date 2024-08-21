@@ -246,6 +246,7 @@ function PersonLinkField({
   defaultSearchExternal,
   nameFormat,
   validateEmailUrl,
+  userSearchEnabled,
   extraParams,
 }) {
   const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
@@ -376,22 +377,24 @@ function PersonLinkField({
               <Translate>Add myself</Translate>
             </Button>
           )}
-          <UserSearch
-            favorites={favoriteUsers}
-            existing={persons.map(p => p.userIdentifier)}
-            onAddItems={onAdd}
-            triggerFactory={props => (
-              <Button type="button" {...props}>
-                <Icon name="search" />
-                <Translate>Add from search</Translate>
-              </Button>
-            )}
-            withExternalUsers
-            withEventPersons={eventId !== null}
-            initialFormValues={{external: defaultSearchExternal}}
-            eventId={eventId}
-            disabled={!sessionUser}
-          />
+          {userSearchEnabled && (
+            <UserSearch
+              favorites={favoriteUsers}
+              existing={persons.map(p => p.userIdentifier)}
+              onAddItems={onAdd}
+              triggerFactory={props => (
+                <Button type="button" {...props}>
+                  <Icon name="search" />
+                  <Translate>Add from search</Translate>
+                </Button>
+              )}
+              withExternalUsers
+              withEventPersons={eventId !== null}
+              initialFormValues={{external: defaultSearchExternal}}
+              eventId={eventId}
+              disabled={!sessionUser}
+            />
+          )}
           {canEnterManually && (
             <Button type="button" onClick={() => setModalOpen('details')}>
               <Icon name="keyboard" />
@@ -438,6 +441,7 @@ PersonLinkField.propTypes = {
   defaultSearchExternal: PropTypes.bool,
   nameFormat: PropTypes.string,
   validateEmailUrl: PropTypes.string,
+  userSearchEnabled: PropTypes.bool,
   extraParams: PropTypes.object,
 };
 
@@ -453,6 +457,7 @@ PersonLinkField.defaultProps = {
   defaultSearchExternal: false,
   nameFormat: '',
   validateEmailUrl: null,
+  userSearchEnabled: true,
   extraParams: {},
 };
 
@@ -469,6 +474,7 @@ export function WTFPersonLinkField({
   nameFormat,
   validateEmailUrl,
   extraParams,
+  userSearchEnabled,
 }) {
   const [persons, setPersons] = useState(
     defaultValue.sort((a, b) => a.displayOrder - b.displayOrder)
@@ -524,6 +530,7 @@ export function WTFPersonLinkField({
       defaultSearchExternal={defaultSearchExternal}
       nameFormat={nameFormat}
       validateEmailUrl={validateEmailUrl}
+      userSearchEnabled={userSearchEnabled}
       extraParams={extraParams}
     />
   );
@@ -542,6 +549,7 @@ WTFPersonLinkField.propTypes = {
   defaultSearchExternal: PropTypes.bool,
   validateEmailUrl: PropTypes.string,
   extraParams: PropTypes.object,
+  userSearchEnabled: PropTypes.bool,
 };
 
 WTFPersonLinkField.defaultProps = {
@@ -556,4 +564,5 @@ WTFPersonLinkField.defaultProps = {
   nameFormat: '',
   validateEmailUrl: null,
   extraParams: {},
+  userSearchEnabled: true,
 };

@@ -277,6 +277,7 @@ const searchFactory = config => {
     single,
     withEventPersons,
     eventId,
+    categoryId,
   }) => {
     const [loading, setLoading] = useState(false);
     const [result, _setResult] = useState(null);
@@ -291,7 +292,7 @@ const searchFactory = config => {
     const handleSearch = async data => {
       setLoading(true);
       try {
-        await runSearch(data, setResult, withEventPersons, eventId);
+        await runSearch(data, setResult, withEventPersons, eventId, categoryId);
       } finally {
         setLoading(false);
       }
@@ -387,6 +388,7 @@ const searchFactory = config => {
     onClose,
     withEventPersons,
     eventId,
+    categoryId,
   }) => {
     const [open, setOpen] = useState(defaultOpen);
     const [staged, setStaged] = useState([]);
@@ -480,6 +482,7 @@ const searchFactory = config => {
             single={single}
             withEventPersons={withEventPersons}
             eventId={eventId}
+            categoryId={categoryId}
           />
         </Modal.Content>
         <Modal.Actions>
@@ -509,6 +512,7 @@ const searchFactory = config => {
     onClose: PropTypes.func,
     withEventPersons: PropTypes.bool,
     eventId: PropTypes.number,
+    categoryId: PropTypes.number,
   };
 
   Search.defaultProps = {
@@ -522,6 +526,7 @@ const searchFactory = config => {
     onClose: () => {},
     withEventPersons: false,
     eventId: null,
+    categoryId: null,
   };
 
   const component = React.memo(Search);
@@ -576,13 +581,17 @@ const InnerUserSearch = searchFactory({
       return {[FORM_ERROR]: 'No criteria specified'};
     }
   },
-  runSearch: async (data, setResult, withEventPersons, eventId) => {
+  runSearch: async (data, setResult, withEventPersons, eventId, categoryId) => {
     setResult(null);
     const values = _.fromPairs(Object.entries(data).filter(([, val]) => !!val));
     values.favorites_first = true;
+    const objectIds = {
+      event_id: eventId !== null ? eventId : '',
+      category_id: categoryId !== null ? categoryId : '',
+    };
     let response;
     try {
-      response = await indicoAxios.get(userSearchURL(values));
+      response = await indicoAxios.get(userSearchURL({...values, ...objectIds}));
     } catch (error) {
       return handleSubmitError(error);
     }

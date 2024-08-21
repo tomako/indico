@@ -9,10 +9,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {WTFPrincipalListField} from 'indico/react/components';
 
-window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ...options}) {
+window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, eventId, categoryId, ...options}) {
   options = {
     ...{
-      eventId: null,
       withGroups: false,
       withExternalUsers: false,
       withEventRoles: false,
@@ -26,7 +25,12 @@ window.setupPrincipalListWidget = function setupPrincipalListWidget({fieldId, ..
   const principals = JSON.parse(field.value);
 
   ReactDOM.render(
-    <WTFPrincipalListField fieldId={fieldId} defaultValue={principals} {...options} />,
+    <WTFPrincipalListField
+      fieldId={fieldId}
+      defaultValue={principals}
+      eventId={eventId}
+      categoryId={categoryId}
+      {...options} />,
     document.getElementById(`userGroupList-${fieldId}`)
   );
 };

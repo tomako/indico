@@ -14,7 +14,7 @@ import {Translate} from 'indico/react/i18n';
 
 import {useFetchPrincipals} from '../principals/hooks';
 import {PendingPrincipalListItem, PrincipalListItem} from '../principals/items';
-import {DefaultUserSearch, GroupSearch} from '../principals/Search';
+import {UserSearch, GroupSearch} from '../principals/Search';
 import {getPrincipalList, PrincipalType} from '../principals/util';
 
 import '../principals/PrincipalListField.module.scss';
@@ -169,11 +169,12 @@ const ACLField = props => {
       {!readOnly && (
         <Button.Group>
           <Button icon="add" as="div" disabled />
-          <DefaultUserSearch
+          <UserSearch
             existing={valueIds}
             onAddItems={handleAddItems}
             favorites={favoriteUsers}
             disabled={disabled}
+            eventId={eventId}
           />
           {withGroups && (
             <GroupSearch existing={valueIds} onAddItems={handleAddItems} disabled={disabled} />

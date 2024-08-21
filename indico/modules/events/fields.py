@@ -93,11 +93,6 @@ class PersonLinkListFieldBase(PrincipalListField):
         self.object = getattr(kwargs['_form'], self.linked_object_attr, None)
 
     @property
-    def event(self):
-        # The event should be a property as it may only be available later, such as, in creation forms
-        return getattr(self.get_form(), 'event', None)
-
-    @property
     def has_predefined_affiliations(self):
         return Affiliation.query.filter(~Affiliation.is_deleted).has_rows()
 

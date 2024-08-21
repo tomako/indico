@@ -125,7 +125,7 @@ class AbstractSubmissionSettingsForm(IndicoForm):
                                                     enum=SubmissionRightsType, sorted=True,
                                                     description=_('Specify who will get contribution submission rights '
                                                                   'once an abstract has been accepted'))
-    authorized_submitters = PrincipalListField(_('Authorized submitters'), event=lambda form: form.event,
+    authorized_submitters = PrincipalListField(_('Authorized submitters'),
                                                allow_external_users=True, allow_groups=True,
                                                allow_event_roles=True, allow_category_roles=True,
                                                description=_('These users may always submit abstracts, '

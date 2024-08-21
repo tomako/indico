@@ -168,7 +168,6 @@ class MenuUserEntryFormBase(IndicoForm):
     acl = PrincipalListField(
         _('Access control list'),
         [HiddenUnless('protection_mode', ProtectionMode.protected, preserve_data=True)],
-        event=lambda form: form.event,
         allow_groups=True,
         allow_event_roles=True,
         allow_category_roles=True,

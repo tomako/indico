@@ -16,6 +16,7 @@ import {camelizeKeys} from 'indico/utils/case';
     const {
       fieldId,
       eventId,
+      categoryId,
       roles,
       sessionUser,
       hasPredefinedAffiliations,
@@ -23,6 +24,7 @@ import {camelizeKeys} from 'indico/utils/case';
       defaultSearchExternal,
       nameFormat,
       extraParams,
+      userSearchEnabled,
       ...rest
     } = options;
     const field = document.getElementById(fieldId);
@@ -56,6 +58,7 @@ import {camelizeKeys} from 'indico/utils/case';
         defaultSearchExternal={defaultSearchExternal}
         nameFormat={nameFormat}
         extraParams={camelizeKeys(extraParams)}
+        userSearchEnabled={userSearchEnabled}
         {...rest}
       />,
       document.getElementById(`person-link-field-${fieldId}`)

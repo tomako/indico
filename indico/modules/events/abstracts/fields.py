@@ -12,6 +12,7 @@ from sqlalchemy.orm import joinedload
 from wtforms import ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.permissions import get_permissions_info
@@ -117,6 +118,16 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         self.sort_by_last_name = True
         self.empty_message = _('There are no authors')
         super().__init__(*args, **kwargs)
+
+    @property
+    def user_search_enabled(self):
+        if config.ALLOW_PUBLIC_USER_SEARCH:
+            return True
+        if session.user and session.user.is_admin:
+            return True
+        if session.user and self.event and self.event.can_manage(session.user, 'ANY'):
+            return True
+        return False
 
     @no_autoflush
     def _get_person_link(self, data):

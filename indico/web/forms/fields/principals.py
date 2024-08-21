@@ -49,7 +49,7 @@ def serialize_principal(principal):
 class PrincipalListField(HiddenField):
     """A field that lets you select a list of principals.
 
-    Principals are users or other objects represending users such as
+    Principals are users or other objects representing users such as
     groups or roles that can be added to ACLs.
 
     :param allow_external_users: If "search users with no indico account"
@@ -76,11 +76,18 @@ class PrincipalListField(HiddenField):
         self.allow_category_roles = kwargs.pop('allow_category_roles', False)
         self.allow_registration_forms = kwargs.pop('allow_registration_forms', False)
         self.allow_emails = kwargs.pop('allow_emails', False)
-        self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
         super().__init__(*args, **kwargs)
 
+    @property
+    def event(self):
+        return getattr(self.get_form(), 'event', None)
+
+    @property
+    def category(self):
+        return getattr(self.get_form(), 'category', None)
+
     def _convert_principal(self, principal):
-        event_id = self._event.id if self._event else None
+        event_id = self.event.id if self.event else None
         return principal_from_identifier(principal, event_id=event_id, allow_groups=self.allow_groups,
                                          allow_external_users=self.allow_external_users,
                                          allow_event_roles=self.allow_event_roles,
@@ -125,6 +132,10 @@ class PrincipalField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.allow_external_users = kwargs.pop('allow_external_users', False)
         super().__init__(*args, **kwargs)
+
+    @property
+    def event(self):
+        return self.get_form().event
 
     def process_formdata(self, valuelist):
         if valuelist:

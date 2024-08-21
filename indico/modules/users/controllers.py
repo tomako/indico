@@ -25,6 +25,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.cache import make_scoped_cache
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.errors import UserValueError
@@ -469,7 +470,10 @@ class RHUserPreferencesMastodonServer(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        return WPUserFavorites.render_template('favorites.html', 'favorites', user=self.user)
+        user_search_enabled = config.ALLOW_PUBLIC_USER_SEARCH or session.user.is_admin
+        return WPUserFavorites.render_template('favorites.html', 'favorites',
+                                               user=self.user,
+                                               user_search_enabled=user_search_enabled)
 
 
 class RHUserFavoritesAPI(RHUserBase):
@@ -891,6 +895,23 @@ search_result_schema = UserSearchResultSchema()
 
 class RHUserSearch(RHProtected):
     """Search for users based on given criteria."""
+
+    @use_kwargs({
+        'category_id': fields.Int(load_default=None),
+        'event_id': fields.Int(load_default=None)
+    }, location='query')
+    def _process_args(self, event_id, category_id):
+        RHProtected._process_args(self)
+        self.event = Event.get(event_id, is_deleted=False) if event_id is not None else None
+        self.category = Category.get(category_id, is_deleted=False) if category_id is not None else None
+
+    def _check_access(self):
+        RHProtected._check_access(self)
+        if not config.ALLOW_PUBLIC_USER_SEARCH:
+            if (not (self.event and self.event.can_manage(session.user, 'ANY')) and
+                    not (self.category and self.category.can_manage(session.user, 'ANY')) and
+                    not session.user.is_admin):
+                raise Forbidden
 
     def _serialize_pending_user(self, entry):
         first_name = entry.data.get('first_name') or ''

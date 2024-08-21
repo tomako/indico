@@ -6,6 +6,10 @@
     </div>
     <script>
         setupFavoriteSelection({{ (user.id if user != session.user else none) | tojson }});
+        setupFavoriteSelection(
+            {{ (user.id if user != session.user else none) | tojson }},
+            {{ user_search_enabled | tojson }}
+        );
         (function() {
             $('.js-delete-category').on('click', function(e){
                 e.preventDefault();
