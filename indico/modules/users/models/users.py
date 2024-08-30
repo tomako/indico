@@ -158,7 +158,7 @@ syncable_fields = {
 
 def format_display_full_name(user, obj):
     from indico.modules.events.layout import layout_settings
-    name_format = layout_settings.get(g.rh.event, 'name_format') if 'rh' in g and hasattr(g.rh, 'event') else None
+    name_format = layout_settings.get(g.rh.event, 'name_format') if 'rh' in g and getattr(g.rh, 'event', None) else None
     if name_format is None:
         name_format = user.settings.get('name_format') if user else NameFormat.first_last
     upper = name_format in (NameFormat.first_last_upper, NameFormat.f_last_upper, NameFormat.last_f_upper,

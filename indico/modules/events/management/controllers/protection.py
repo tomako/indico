@@ -8,9 +8,10 @@
 import json
 from operator import attrgetter
 
-from flask import flash, jsonify, redirect, request
-from werkzeug.exceptions import NotFound
+from flask import flash, jsonify, redirect, request, session
+from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.config import config
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.core.permissions import (get_available_permissions, get_permissions_info, get_principal_permissions,
                                      update_permissions)
@@ -128,6 +129,12 @@ class RHPermissionsDialog(RH):
 
 
 class RHEventPrincipals(PrincipalsMixin, RHAuthenticatedEventBase):
+    def _check_access(self):
+        RHAuthenticatedEventBase._check_access(self)
+        if not config.ALLOW_PUBLIC_USER_SEARCH:
+            if not self.event.can_manage(session.user, 'ANY') and not session.user.is_admin:
+                raise Forbidden
+
     @use_rh_kwargs({
         'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_event_roles=True,
                                 allow_category_roles=True, allow_registration_forms=True, allow_emails=True,

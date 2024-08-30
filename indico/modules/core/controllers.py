@@ -15,7 +15,7 @@ from packaging.version import Version
 from pytz import common_timezones_set
 from webargs import fields
 from webargs.flaskparser import abort
-from werkzeug.exceptions import NotFound, ServiceUnavailable
+from werkzeug.exceptions import Forbidden, NotFound, ServiceUnavailable
 from werkzeug.routing import BuildError
 
 import indico
@@ -27,11 +27,13 @@ from indico.core.notifications import make_email, send_email
 from indico.core.sentry import submit_user_feedback
 from indico.core.settings import PrefixSettingsProxy
 from indico.modules.admin import RHAdminBase
+from indico.modules.categories import Category
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.captcha import generate_captcha_challenge, get_captcha_plugin
 from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
+from indico.modules.events import Event
 from indico.modules.legal import legal_settings
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.users.schemas import AffiliationSchema
@@ -259,11 +261,23 @@ class RHPrincipals(PrincipalsMixin, RHProtected):
     """
 
     @use_kwargs({
+        'event_id': fields.Int(load_default=None, allow_none=True),
+        'category_id': fields.Int(load_default=None, allow_none=True),
         'values': PrincipalDict(allow_groups=True, allow_external_users=True, allow_emails=True,
                                 load_default=lambda: {})
     })
-    def _process_args(self, values):
+    def _process_args(self, event_id, category_id, values):
+        self.event = Event.get(event_id, is_deleted=False) if event_id is not None else None
+        self.category = Category.get(category_id, is_deleted=False) if category_id is not None else None
         self.values = values
+
+    def _check_access(self):
+        RHProtected._check_access(self)
+        if not config.ALLOW_PUBLIC_USER_SEARCH:
+            if (not (self.event and self.event.can_manage(session.user, 'ANY')) and
+                    not (self.category and self.category.can_manage(session.user, 'ANY')) and
+                    not session.user.is_admin):
+                raise Forbidden
 
 
 class RHSignURL(RH):

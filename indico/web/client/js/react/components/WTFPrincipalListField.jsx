@@ -17,9 +17,11 @@ export default function WTFPrincipalListField({
   fieldId,
   defaultValue,
   protectedFieldId,
+  eventId,
+  categoryId,
   ...otherProps
 }) {
-  const favoriteUsersController = useFavoriteUsers();
+  const favoriteUsersController = useFavoriteUsers(null, false, eventId, categoryId);
   const protectedField = useMemo(
     () => protectedFieldId && document.getElementById(protectedFieldId),
     [protectedFieldId]
@@ -57,6 +59,8 @@ export default function WTFPrincipalListField({
       onBlur={() => {}}
       value={value}
       styleName="opaque"
+      eventId={eventId}
+      categoryId={categoryId}
       {...otherProps}
     />
   );
@@ -66,9 +70,13 @@ WTFPrincipalListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
   defaultValue: PropTypes.arrayOf(PropTypes.string),
   protectedFieldId: PropTypes.string,
+  eventId: PropTypes.number,
+  categoryId: PropTypes.number,
 };
 
 WTFPrincipalListField.defaultProps = {
   defaultValue: [],
   protectedFieldId: null,
+  eventId: null,
+  categoryId: null,
 };

@@ -23,7 +23,7 @@ export default function TrackACLField({
 }) {
   const [currentValue, setCurrentValue] = useState(value);
   const permissionManager = new PermissionManager(permissionInfo.tree, permissionInfo.default);
-  const favoriteUsersController = useFavoriteUsers();
+  const favoriteUsersController = useFavoriteUsers(null, false, eventId);
   return (
     <ACLField
       value={currentValue}

@@ -25,7 +25,7 @@ const useAxios = makeUseAxios({
   },
 });
 
-export const useFavoriteUsers = (userId = null, lazy = false) => {
+export const useFavoriteUsers = (userId = null, lazy = false, eventId = null, categoryId = null) => {
   // XXX: this state should ideally be global so if this hook is used more than
   // once on the same page we keep the favorites in sync and don't send multiple
   // requests to load the initial list
@@ -62,7 +62,7 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
     const values = ids.map(id => `User:${id}`);
     let response;
     try {
-      response = await indicoAxios.post(principalsURL(), {values}, {signal});
+      response = await indicoAxios.post(principalsURL(), {event_id: eventId, category_id: categoryId, values}, {signal});
     } catch (error) {
       handleAxiosError(error);
       return null;
@@ -121,13 +121,20 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
  * Do not use this for new components; write them as functional
  * components instead!
  */
-export const FavoritesProvider = ({children}) => {
-  const favoriteUsersController = useFavoriteUsers();
+export const FavoritesProvider = ({children, eventId, categoryId}) => {
+  const favoriteUsersController = useFavoriteUsers(null, false, eventId, categoryId);
   return children(favoriteUsersController);
 };
 
 FavoritesProvider.propTypes = {
   children: PropTypes.func.isRequired,
+  eventId: PropTypes.number,
+  categoryId: PropTypes.number,
+};
+
+FavoritesProvider.defaultProps = {
+  eventId: null,
+  categoryId: null,
 };
 
 /**

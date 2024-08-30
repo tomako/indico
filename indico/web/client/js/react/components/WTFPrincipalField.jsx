@@ -22,7 +22,7 @@ export default function WTFPrincipalField({
   eventId,
   categoryId,
 }) {
-  const favoriteUsersController = useFavoriteUsers();
+  const favoriteUsersController = useFavoriteUsers(null, false, eventId, categoryId);
   const inputField = useMemo(() => document.getElementById(fieldId), [fieldId]);
   const [value, setValue] = useState(defaultValue);
 

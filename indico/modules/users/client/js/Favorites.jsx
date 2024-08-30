@@ -34,7 +34,9 @@ function FavoriteManager({userId, userSearchEnabled}) {
   return (
     <>
       <div className="row">
-        <FavoriteUserManager userId={userId} userSearchEnabled={userSearchEnabled} />
+        {userSearchEnabled && (
+          <FavoriteUserManager userId={userId} />
+        )}
         <FavoriteCatManager userId={userId} />
       </div>
       <div className="row">
@@ -251,7 +253,7 @@ FavoriteEventManager.defaultProps = {
   userId: null,
 };
 
-function FavoriteUserManager({userId, userSearchEnabled}) {
+function FavoriteUserManager({userId}) {
   const [favoriteUsers, [addFavoriteUser, deleteFavoriteUser], loading] = useFavoriteUsers(userId);
 
   const searchTrigger = triggerProps => (
@@ -305,23 +307,19 @@ function FavoriteUserManager({userId, userSearchEnabled}) {
           )}
         </div>
       </div>
-      {userSearchEnabled && (
-        <UserSearch
-          existing={Object.values(favoriteUsers).map(u => u.identifier)}
-          onAddItems={e => e.forEach(u => addFavoriteUser(u.userId))}
-          triggerFactory={searchTrigger}
-        />
-      )}
+      <UserSearch
+        existing={Object.values(favoriteUsers).map(u => u.identifier)}
+        onAddItems={e => e.forEach(u => addFavoriteUser(u.userId))}
+        triggerFactory={searchTrigger}
+      />
     </div>
   );
 }
 
 FavoriteUserManager.propTypes = {
   userId: PropTypes.number,
-  userSearchEnabled: PropTypes.bool,
 };
 
 FavoriteUserManager.defaultProps = {
   userId: null,
-  userSearchEnabled: true,
 };

@@ -24,7 +24,7 @@ import {PermissionManager} from './util';
  * @param {Array} principalIds - list of principal IDs
  * @param {Number} eventId - list of the event id if event-related principals are allowed
  */
-export const useFetchPrincipals = (principalIds, eventId = null) => {
+export const useFetchPrincipals = (principalIds, eventId = null, categoryId = null) => {
   const [informationMap, setInformationMap] = useState({});
   const missingPrincipalIds = _.difference(principalIds, Object.keys(informationMap));
 
@@ -33,6 +33,8 @@ export const useFetchPrincipals = (principalIds, eventId = null) => {
       url: eventId === null ? principalsURL() : eventPrincipalsURL({event_id: eventId}),
       method: 'POST',
       data: {
+        event_id: eventId,
+        category_id: categoryId,
         values: missingPrincipalIds,
       },
     },

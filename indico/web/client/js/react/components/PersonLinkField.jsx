@@ -249,7 +249,7 @@ function PersonLinkField({
   userSearchEnabled,
   extraParams,
 }) {
-  const [favoriteUsers] = useFavoriteUsers(null, !sessionUser);
+  const [favoriteUsers] = userSearchEnabled ? useFavoriteUsers(null, !sessionUser, eventId) : [null];
   const [modalOpen, setModalOpen] = useState('');
   const [selected, setSelected] = useState(null);
   const sections = roles.filter(x => x.section);

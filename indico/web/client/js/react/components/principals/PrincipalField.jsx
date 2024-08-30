@@ -65,7 +65,7 @@ const PrincipalField = props => {
       try {
         response = await indicoAxios.post(
           principalsURL(),
-          {values: [value]},
+          {eventId: eventId, categoryId: categoryId, values: [value]},
           {signal: controller.signal}
         );
       } catch (error) {

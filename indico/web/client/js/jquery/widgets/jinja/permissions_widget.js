@@ -485,7 +485,7 @@ import Palette from 'indico/utils/palette';
       const existing = JSON.parse(this.$dataField.val()).map(e => e[0].identifier);
 
       ReactDOM.render(
-        <FavoritesProvider>
+        <FavoritesProvider eventId={this.options.eventId} categoryId={this.options.categoryId}>
           {([favorites]) => (
             <>
               <UserSearch

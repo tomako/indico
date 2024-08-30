@@ -49,7 +49,7 @@ const PrincipalListField = props => {
   const [favoriteUsers, [handleAddFavorite, handleDelFavorite]] = favoriteUsersController;
 
   const usedIdentifiers = new Set(value);
-  const informationMap = useFetchPrincipals(value, eventId);
+  const informationMap = useFetchPrincipals(value, eventId, categoryId);
   const {
     eventRoles,
     categoryRoles,
