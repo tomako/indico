@@ -6,17 +6,19 @@
 # LICENSE file for more details.
 
 from flask import flash, jsonify, redirect, render_template, request, session
+from marshmallow import fields
 
 from indico.core.db import db
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.models.tags import RegistrationTag
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.forms import ReminderForm
-from indico.modules.events.reminders.models.reminders import EventReminder
-from indico.modules.events.reminders.util import make_reminder_email
+from indico.modules.events.reminders.models.reminders import EventReminder, ReminderType
+from indico.modules.events.reminders.util import get_reminder_email_tpl
 from indico.modules.events.reminders.views import WPReminders
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
+from indico.web.args import use_kwargs
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
@@ -114,8 +116,14 @@ class RHEditReminder(RHSpecificReminderBase):
 class RHAddReminder(RHRemindersBase):
     """Add a new reminder."""
 
-    def _process(self):
-        form = ReminderForm(event=self.event, schedule_type='relative', attach_ical=True)
+    @use_kwargs({
+        'reminder_type': fields.Enum(ReminderType, required=True)
+    }, location='query')
+    def _process(self, reminder_type):
+        form = ReminderForm(event=self.event,
+                            schedule_type='relative',
+                            attach_ical=reminder_type == ReminderType.classic,
+                            reminder_type=reminder_type)
         if form.validate_on_submit():
             reminder = EventReminder(creator=session.user, event=self.event)
             form.populate_obj(reminder, skip=['tags'], existing_only=True)
@@ -143,12 +151,22 @@ class RHAddReminder(RHRemindersBase):
 class RHPreviewReminder(RHRemindersBase):
     """Preview the email for a reminder."""
 
-    def _process(self):
-        include_summary = request.form.get('include_summary') == '1'
-        include_description = request.form.get('include_description') == '1'
+    @use_kwargs({
+        'reminder_type': fields.Enum(ReminderType, required=True),
+        'include_summary': fields.Boolean(required=True),
+        'include_description': fields.Boolean(required=True),
+        'subject': fields.String(required=True),
+        'message': fields.String(required=True),
+    }, location='form')
+    def _process(self, reminder_type, include_summary, include_description, subject, message):
         with self.event.force_event_locale():
-            tpl = make_reminder_email(self.event, include_summary, include_description, request.form.get('message'))
-            subject = tpl.get_subject()
-            body = tpl.get_body()
+            email_tpl = get_reminder_email_tpl(self.event,
+                                               reminder_type,
+                                               include_summary,
+                                               include_description,
+                                               subject,
+                                               message)
+            subject = email_tpl.get_subject()
+            body = email_tpl.get_body()
         html = render_template('events/reminders/preview.html', subject=subject, body=body)
         return jsonify(html=html)
